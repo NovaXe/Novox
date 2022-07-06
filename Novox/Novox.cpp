@@ -13,7 +13,7 @@ int main()
 
     game::init();
 
-
+    // TODO: Leave all openGL stuff inside the game namespace and handle the window myself
     GLFWwindow* gameWindow = glfwGetCurrentContext();
 
     while (!glfwWindowShouldClose(gameWindow)) {
