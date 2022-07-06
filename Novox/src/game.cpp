@@ -1,6 +1,8 @@
 #define FMT_HEADER_ONLY
 
 #include "novox/game.h"
+#include "novox/shader.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -8,10 +10,13 @@
 
 
 namespace game {
-	
+	using namespace shader;
+
 	int window_width = 800;
 	int window_height = 600;
 	
+
+
 	void init() {
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -37,8 +42,8 @@ namespace game {
 			printf("Failed to initialize GLAD");
 		}
 
-
-
+		Shader lightingShader("shaders/LightingShader.vs.glsl", "shaders/LightingShader.fs.glsl");
+		Shader lightSourceShader("shaders/LightSource.vs.glsl", "shaders/LightSource.fs.glsl");
 
 
 

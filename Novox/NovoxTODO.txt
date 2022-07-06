@@ -1,0 +1,17 @@
+REWRITE TODO
+
+classes everywhere
+shader class
+world class
+chunk class
+block class
+
+relearn how I did everything
+admire my smart code
+optimize
+
+iron out bugs from before by rewriting with minimal manual memory management using fancy cpp functions and containers
+minimal inheritance
+
+keep the code clean like in c, sparingly use oop and cpp things
+readability >

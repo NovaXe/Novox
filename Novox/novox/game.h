@@ -8,6 +8,8 @@
 #include <fmt/core.h>
 
 namespace game {
+	
+
 	void init();
 
 	void render();

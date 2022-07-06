@@ -18,6 +18,9 @@ int main()
 
     while (!glfwWindowShouldClose(gameWindow)) {
 
+
+        game::render();
+
     }
 
     return 0;

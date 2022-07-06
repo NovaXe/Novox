@@ -146,9 +146,11 @@
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="Novox.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="novox\game.h" />
+    <ClInclude Include="novox\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
