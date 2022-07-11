@@ -26,6 +26,7 @@ namespace novox::world {
 		Chunk& getChunk(int x_loc, int y_loc, int z_loc);
 
 		WorldVoxel& getVoxel(int x_coord, int y_coord, int z_coord);
+		WorldVoxel& getVoxel(const glm::vec3& pos);
 		bool checkBounds(const glm::vec3& pos);
 	};
 
@@ -44,6 +45,7 @@ namespace novox::world {
 	public:
 		Chunk();
 		void draw(shader::Shader& shader);
+		void tagForRegen();
 		void setLocation(const glm::vec3& location);
 		const glm::vec3& getLocation();
 		WorldVoxel& getVoxel(int x_loc, int y_loc, int z_loc);

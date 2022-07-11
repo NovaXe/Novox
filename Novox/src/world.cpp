@@ -51,9 +51,14 @@ namespace novox::world {
 	WorldVoxel& World::getVoxel(int x_coord, int y_coord, int z_coord)
 	{
 		Chunk& chunk = getChunkAt(x_coord, y_coord, z_coord);
-		WorldVoxel& voxel = chunk.getVoxel(x_coord % 16, y_coord % 16, z_coord % 16);
+ 		WorldVoxel& voxel = chunk.getVoxel(x_coord % 16, y_coord % 16, z_coord % 16);
 		return voxel;
 	}
+	WorldVoxel& World::getVoxel(const glm::vec3& pos)
+	{
+		return getVoxel(pos.x, pos.y, pos.z);
+	}
+
 
 	bool World::checkBounds(const glm::vec3& pos)
 	{
@@ -87,9 +92,16 @@ namespace novox::world {
 		WorldVoxel& voxel = blocks.at(x_loc, y_loc, z_loc);
 		return voxel;
 	}
+	
+
+
 	void Chunk::draw(shader::Shader& shader)
 	{
 		this->mesh->draw(shader, this->location);
+	}
+
+	void Chunk::tagForRegen() {
+		this->mesh->needsRegen = true;
 	}
 
 	void Chunk::generateMesh(World* world)

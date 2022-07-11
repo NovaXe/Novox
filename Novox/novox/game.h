@@ -31,6 +31,8 @@ namespace novox {
 
 		void processInput();
 		void mouseMoved(double xpos, double ypos);
+		void mouseClicked(int button, int action, int mods);
+		void mouseScrolled(double xoffset, double yoffset);
 
 	};
 

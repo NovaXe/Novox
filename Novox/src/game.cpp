@@ -75,6 +75,16 @@ namespace novox {
 			game->mouseMoved(xpos, ypos);
 
 		});
+
+		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+			Game* game= Game::getInstance(0);
+			game->mouseClicked(button, action, mods);
+		});
+
+		glfwSetScrollCallback(window, [](GLFWwindow* widnow, double xoffset, double yoffset) {
+			Game* game = Game::getInstance(0);
+			game->mouseScrolled(xoffset, yoffset);
+		});
 		
 		world::initializeBlocks();
 		this->world = new world::World(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE);
@@ -244,14 +254,14 @@ namespace novox {
 		glm::mat4 model = glm::mat4(1.0f);
 		auto sel = this->player->getSelectionPos();
 
-		model = glm::translate(model, sel);
-
+		model = glm::translate(model, glm::floor(sel));
+		lightingShader.use();
 		lightingShader.setMat4("model", model);
 		lightingShader.setVec3("objectColor", glm::vec3(0.0));
 
 		glDisable(GL_CULL_FACE);
 
-		if (0) {
+		if (1) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glLineWidth(4);
 			glBindVertexArray(selectionVAO);
@@ -264,18 +274,18 @@ namespace novox {
 		
 		
 		glfwSwapBuffers(this->window);
-		glfwPollEvents();
+glfwPollEvents();
 
-		static float deltaSec = 0.0;
-		//fmt::print(stderr, "lastsec {}\n", deltaSec);
-		deltaSec += deltaTime;
-		if (deltaSec >= 1.0) {
-			glfwSetWindowTitle(this->window, fmt::format("Novox: {} FPS", frame_count).c_str());
-			frame_count = 0;
-			deltaSec = 0.0;
-		}
-		
-		
+static float deltaSec = 0.0;
+//fmt::print(stderr, "lastsec {}\n", deltaSec);
+deltaSec += deltaTime;
+if (deltaSec >= 1.0) {
+	glfwSetWindowTitle(this->window, fmt::format("Novox: {} FPS", frame_count).c_str());
+	frame_count = 0;
+	deltaSec = 0.0;
+}
+
+
 
 	}
 
@@ -302,7 +312,7 @@ namespace novox {
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)		//forward
 		{
 			this->player->displaceRelative(0, 0, speed);
-			
+
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)		//backwward
 		{
@@ -325,8 +335,12 @@ namespace novox {
 		{
 			this->player->displaceRelative(0, -90, speed);
 		}
+		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+			auto sel = this->player->getSelectionPos() * 2;
+			fmt::print("selection: {}, {}, {}\r", sel.x, sel.y, sel.z);
+		}
 
-		fmt::print("pos: {}, {}, {}\r", this->player->getPos().x, this->player->getPos().y, this->player->getPos().z);
+		//fmt::print("pos: {}, {}, {}\r", this->player->getPos().x, this->player->getPos().y, this->player->getPos().z);
 
 	}
 
@@ -341,23 +355,47 @@ namespace novox {
 		lastX = xpos;
 		lastY = ypos;
 
-		
+
 
 		auto pitch = &this->player->getCamera()->pitch;
 		auto yaw = &this->player->getCamera()->yaw;
-		
+
 		if (*pitch > 89.0f)
 			*pitch = 89.0f;
 		if (*pitch < -89.0f)
 			*pitch = -89.0f;
 
-		
+
 		//glfwSetWindowTitle(this->window, fmt::format("Novox: {}, {}", *yaw, *pitch).c_str());
 
 		this->player->lookTowards(deltaX * sensitivity, deltaY * sensitivity);
-		
+
 	}
 
+	void Game::mouseClicked(int button, int action, int mods) {
+		glm::vec3 selpos = glm::floor(this->player->getSelectionPos());
+		if (!this->world->checkBounds(selpos)){
+			return;
+		}
+
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
+			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::air)];
+
+			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
+			chunk.tagForRegen();
+		}
+		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
+			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::stone)];
+			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
+			chunk.tagForRegen();
+		}
+	}
+
+	void Game::mouseScrolled(double xoffset, double yoffset) {
+
+	}
 	
 
 }
