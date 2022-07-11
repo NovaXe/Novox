@@ -1,26 +1,42 @@
-#pragma once
-#ifndef GAME_H
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <windows.h>
 #include <fmt/core.h>
 
-namespace game {
-	
+#include <vector>
+#include "novox/player.h"
+#include "novox/world.h"
+#include "novox/world.h"
 
-	void init();
 
-	void render();
+namespace novox {
+	class Game {
+	private:
+		Player* player;
+		world::World* world;
+		static std::unordered_map<unsigned int, Game*> instances;
+		
+	public:
+		GLFWwindow* window;
+		unsigned int id;
 
-	void tick();
-	
-	void close();
+		Game();
+		~Game();
+
+		void render();
+		void tick();
+
+		static Game* getInstance(unsigned int id);
+
+		void processInput();
+		void mouseMoved(double xpos, double ypos);
+
+	};
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-	void processInput(GLFWwindow* window);
+
+	//void processInput(GLFWwindow* window);
 }
 
-#endif // GAME

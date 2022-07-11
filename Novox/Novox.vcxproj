@@ -112,6 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,14 +145,23 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\block.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="Novox.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="novox\block.h" />
     <ClInclude Include="novox\game.h" />
+    <ClInclude Include="novox\player.h" />
+    <ClInclude Include="novox\mesh.h" />
     <ClInclude Include="novox\shader.h" />
+    <ClInclude Include="novox\util.h" />
+    <ClInclude Include="novox\world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

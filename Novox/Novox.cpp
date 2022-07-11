@@ -11,15 +11,18 @@ int main()
 {
     fmt::print("Novox has started\n");
 
-    game::init();
+    novox::Game* game = new novox::Game();
+    
+    
 
     // TODO: Leave all openGL stuff inside the game namespace and handle the window myself
-    GLFWwindow* gameWindow = glfwGetCurrentContext();
 
-    while (!glfwWindowShouldClose(gameWindow)) {
+    //GLFWwindow* gameWindow = glfwGetCurrentContext();
 
+    while (!glfwWindowShouldClose(game->window)) {
 
-        game::render();
+        game->render();
+        game->tick();
 
     }
 

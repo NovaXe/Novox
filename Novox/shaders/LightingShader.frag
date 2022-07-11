@@ -35,6 +35,6 @@ void main()
 
     vec3 result = (ambient + diffuse + specular) * Color;
 
-    FragColor = texture(objectTexture, UV) * vec4 (result, 1.0);
+    FragColor = /*texture(objectTexture, UV) **/ vec4 (result, 1.0);
 
 }

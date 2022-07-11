@@ -15,7 +15,8 @@
 
 namespace shader {
 
-	
+	std::unordered_map<std::string, Shader*> Shader::shadermap;
+
 	unsigned int Shader::compile(const std::string& vertexPath, const std::string& fragmentPath) {
 		// Vertex and Fragment shader files
 		std::string vertexCode, fragmentCode;
@@ -93,6 +94,10 @@ namespace shader {
 		return programID;
 	}
 
+	Shader::Shader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath) {
+		this->ID = compile(vertexPath, fragmentPath);
+		shadermap[name] = this;
+	}
 	Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 		this->ID = compile(vertexPath, fragmentPath);
 	}

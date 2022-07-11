@@ -1,7 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
+#include <unordered_map>
 
 
 
@@ -10,13 +10,18 @@ namespace shader {
 
 	
 
+
+
 	class Shader{
 	private:
 		unsigned int compile(const std::string& vertexPath, const std::string& fragmentPath);
 		unsigned int ID;
 	public:
+		Shader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
 		Shader(const std::string& vertexPath, const std::string& fragmentPath);
 		Shader() = default;
+
+		static std::unordered_map<std::string, Shader*> shadermap;
 
 		void use();
 

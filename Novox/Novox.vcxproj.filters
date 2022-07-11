@@ -27,12 +27,39 @@
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="novox\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="novox\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="novox\world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="novox\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="novox\block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="novox\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="novox\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
