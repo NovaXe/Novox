@@ -45,7 +45,9 @@ namespace novox::world {
 		return chunk;
 	}
 
+	void World::updateConnectedChunks(glm::vec3 position) {
 
+	}
 
 
 	WorldVoxel& World::getVoxel(int x_coord, int y_coord, int z_coord)

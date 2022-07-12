@@ -25,6 +25,8 @@ namespace novox::world {
 		Chunk& getChunkAt(int x_coord, int y_coord, int z_coord);
 		Chunk& getChunk(int x_loc, int y_loc, int z_loc);
 
+		void updateConnectedChunks(glm::vec3 position);
+
 		WorldVoxel& getVoxel(int x_coord, int y_coord, int z_coord);
 		WorldVoxel& getVoxel(const glm::vec3& pos);
 		bool checkBounds(const glm::vec3& pos);

@@ -22,7 +22,7 @@
 #include "novox/mesh.h"
 #include "novox/util.h"
 
-#define WORLD_SIZE 4
+#define WORLD_SIZE 2
 
 
 namespace novox {
@@ -229,7 +229,7 @@ namespace novox {
 		lightingShader.setMat4("projection", projection);
 
 		lightingShader.setVec3("lightColor", glm::vec3(1.0, 1.0, 1.0));
-		lightingShader.setVec3("lightPos", glm::vec3(WORLD_SIZE * 16, WORLD_SIZE * 16, WORLD_SIZE * 16));
+		lightingShader.setVec3("lightPos", glm::vec3(WORLD_SIZE * 16, WORLD_SIZE * 16 + 8, WORLD_SIZE * 16));
 		lightingShader.setVec3("viewPos", glm::vec3(0, 0, 0));
 
 		for (int x = 0; x < WORLD_SIZE; x++) {
@@ -302,7 +302,7 @@ if (deltaSec >= 1.0) {
 
 	void Game::processInput()
 	{
-		auto speed = this->player->speed() * deltaTime * 10;
+		auto speed = this->player->speed() * deltaTime * 2;
 
 		//Uses the Esc key to close the window
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -336,7 +336,7 @@ if (deltaSec >= 1.0) {
 			this->player->displaceRelative(0, -90, speed);
 		}
 		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-			auto sel = this->player->getSelectionPos() * 2;
+			auto sel = glm::floor(this->player->getSelectionPos());
 			fmt::print("selection: {}, {}, {}\r", sel.x, sel.y, sel.z);
 		}
 
@@ -378,18 +378,88 @@ if (deltaSec >= 1.0) {
 			return;
 		}
 
+		std::vector<glm::vec3> adjacent = {
+			selpos + glm::vec3(0, 1, 0),
+			selpos + glm::vec3(0, -1, 0),
+			selpos + glm::vec3(1, 0, 0),
+			selpos + glm::vec3(-1, 0, 0),
+			selpos + glm::vec3(0, 0, 1),
+			selpos + glm::vec3(0, 0, -1),
+		};
+
+
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::air)];
 
 			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
 			chunk.tagForRegen();
+			glm::vec3 chunkMid = chunk.getLocation() * 16.0f + glm::vec3(8);
+			glm::vec3 selectDirection = selpos - chunkMid;
+			if (glm::abs(selectDirection.x) == 8 || glm::abs(selectDirection.y) == 8 || glm::abs(selectDirection.z) == 8) {
+				glm::vec3 offset = glm::ivec3(selectDirection / 8);
+
+				if (offset.x != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x + offset.x, selpos.y, selpos.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				if (offset.y != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x, selpos.y + offset.y, selpos.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				if (offset.z != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x, selpos.y, selpos.z + offset.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				
+			}
+
+			
+
+
 		}
 		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::stone)];
+
 			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
 			chunk.tagForRegen();
+			glm::vec3 chunkMid = chunk.getLocation() * 16.0f + glm::vec3(8);
+			glm::vec3 selectDirection = selpos - chunkMid;
+
+			if (glm::abs(selectDirection.x) == 8) {
+				
+			}
+			if (glm::abs(selectDirection.y) == 8) {
+
+			}
+			if (glm::abs(selectDirection.z) == 8) {
+
+			}
+
+			if (glm::abs(selectDirection.x) == 8 || glm::abs(selectDirection.y) == 8 || glm::abs(selectDirection.z) == 8) {
+				glm::vec3 offset = glm::ivec3(selectDirection / 8);
+				
+				if (offset.x != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x + offset.x, selpos.y, selpos.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				if (offset.y != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x, selpos.y + offset.y, selpos.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				if (offset.z != 0) {
+					auto& nc = this->world->getChunkAt(selpos.x, selpos.y, selpos.z + offset.z);
+					nc.tagForRegen();
+					fmt::print("regenerated neighbor mesh\n");
+				}
+				
+			}
 		}
 	}
 
