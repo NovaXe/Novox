@@ -5,7 +5,7 @@
 #include <glm/ext.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 //#include <glm/ext/matrix_transform.hpp>
-#include "novox/shader.h"
+#include "novox/rendering.h"
 #include "novox/util.h"
 #include <fmt/core.h>
 
@@ -56,8 +56,10 @@ namespace novox::mesh {
 		this->vertices.clear();
 	}
 
-	void ChunkMesh::draw(shader::Shader& shader, const glm::vec3& loc)
+	void ChunkMesh::draw(rendering::Shader& shader, const glm::vec3& loc)
 	{
+		static rendering::Texture textureAtlas("textures/TextureAtlas.png");
+		textureAtlas.bind();
 		shader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, loc * 16.0f);
@@ -70,7 +72,7 @@ namespace novox::mesh {
 		glDrawArrays(GL_TRIANGLES, 0, this->vertexCount);
 		glBindVertexArray(0);
 		glUseProgram(0);
-		
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void ChunkMesh::addVertex(Vertex& vertex)

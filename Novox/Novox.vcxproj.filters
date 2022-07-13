@@ -24,7 +24,7 @@
     <ClCompile Include="src\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\shader.cpp">
+    <ClCompile Include="src\rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\world.cpp">
@@ -39,12 +39,15 @@
     <ClCompile Include="src\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\stb_image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="novox\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="novox\shader.h">
+    <ClInclude Include="novox\rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="novox\world.h">

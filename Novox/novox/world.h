@@ -9,7 +9,7 @@
 #include "novox/util.h"
 #include "novox/block.h"
 #include "novox/mesh.h"
-#include "novox/shader.h"
+#include "novox/rendering.h"
 
 namespace novox::world {
 	class World;
@@ -46,7 +46,7 @@ namespace novox::world {
 
 	public:
 		Chunk();
-		void draw(shader::Shader& shader);
+		void draw(rendering::Shader& shader);
 		void tagForRegen();
 		void setLocation(const glm::ivec3& location);
 		const glm::ivec3& getLocation();

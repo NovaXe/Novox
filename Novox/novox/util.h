@@ -7,6 +7,10 @@
 #include <stdexcept>
 #include <fmt/core.h>
 
+
+#define RUNONCE_START static bool run_once = []()->bool{
+#define RUNONCE_END return true;}();
+
 namespace novox::util {
 
 	template <class T> class Array3D {

@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include <novox/shader.h>
+#include <novox/rendering.h>
 
 namespace novox::mesh{
 
@@ -32,7 +32,7 @@ namespace novox::mesh{
 	public:
 		ChunkMesh();
 		void update();
-		void draw(shader::Shader& shader, const glm::vec3& loc);
+		void draw(rendering::Shader& shader, const glm::vec3& loc);
 		void addVertex(Vertex& vertex);
 
 		bool needsRegen;

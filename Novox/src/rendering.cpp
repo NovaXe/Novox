@@ -1,5 +1,7 @@
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <stb_image.h>
 
 #include <windows.h>
 #include <fmt/core.h>
@@ -11,13 +13,13 @@
 #include <sstream>
 
 
-#include "novox/shader.h"
+#include "novox/rendering.h"
 
-namespace shader {
+namespace rendering {
 
 	std::unordered_map<std::string, Shader*> Shader::shadermap;
 
-	unsigned int Shader::compile(const std::string& vertexPath, const std::string& fragmentPath) {
+	GLuint Shader::compile(const std::string& vertexPath, const std::string& fragmentPath) {
 		// Vertex and Fragment shader files
 		std::string vertexCode, fragmentCode;
 		std::ifstream vertexFile, fragmentFile;
@@ -51,7 +53,7 @@ namespace shader {
 		const char* fragmentShaderCode = fragmentCode.c_str();
 
 
-		unsigned int programID, vertex, fragment;
+		GLuint programID, vertex, fragment;
 		int success;
 		char infoLog[512];
 
@@ -106,8 +108,6 @@ namespace shader {
 		glUseProgram(this->ID);
 		//CurrentShader = std::make_unique<Shader>(this);
 
-
-
 	}
 
 	void Shader::setBool(const std::string& name, bool value) const {
@@ -126,6 +126,49 @@ namespace shader {
 
 	void Shader::setMat4(const std::string& name, glm::mat4 mat) const {
 		glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+	}
+
+	GLuint Texture::load()
+	{
+		//static bool run_once = []()->bool {stbi_set_flip_vertically_on_load(true); return true; }();
+
+		GLuint texid = 0;
+		glGenTextures(1, &texid);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		int width, height, nrChannels;
+
+		static unsigned char* imgData;
+		imgData = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
+
+		if (imgData != NULL) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			fmt::print("Succesfully loaded Texture\n");
+		}
+		else {
+			fmt::print("Failed to load Texture\n");
+		}
+		stbi_image_free(imgData);
+		glBindTexture(GL_TEXTURE_2D, texid);
+
+		return texid;
+	}
+
+	Texture::Texture(const std::string& texturePath)
+	{
+		this->path = texturePath;
+		this->ID = load();
+	}
+
+	void Texture::bind()
+	{
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, this->ID);
 	}
 
 }

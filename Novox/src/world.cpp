@@ -11,7 +11,7 @@
 #include "novox/world.h"
 #include "novox/block.h"
 #include "novox/util.h"
-#include "novox/shader.h"
+#include "novox/rendering.h"
 
 namespace novox::world {
 	
@@ -142,7 +142,7 @@ namespace novox::world {
 	
 
 
-	void Chunk::draw(shader::Shader& shader)
+	void Chunk::draw(rendering::Shader& shader)
 	{
 		this->mesh->draw(shader, this->location);
 	}
@@ -194,28 +194,17 @@ namespace novox::world {
 				mesh::Vertex vertex = {};
 				glm::vec3 vertexPos(blockFace[i + 0], blockFace[i + 1], blockFace[i + 2]);
 
-				/*int uOffset = blockFace[i + 3] * TEXTURE_WIDTH;
+				int uOffset = blockFace[i + 3] * TEXTURE_WIDTH;
 				int vOffset = blockFace[i + 4] * TEXTURE_WIDTH;
 
-				float texU = ((block->blockID - 1 % ATLAS_WIDTH) + (float)blockFace[i + 3]) / ATLAS_WIDTH;
-				float texV = ((floor((block->blockID - 1) / ATLAS_WIDTH)) + (float)blockFace[i + 4]) / ATLAS_WIDTH;*/
+				float texU = ((voxel.block->block_id - 1 % TEXTURE_ATLAS_WIDTH) + (float)blockFace[i + 3]) / TEXTURE_ATLAS_WIDTH;
+				float texV = ((floor((voxel.block->block_id - 1) / TEXTURE_ATLAS_WIDTH)) + (float)blockFace[i + 4]) / TEXTURE_ATLAS_WIDTH;
 
-
-					
-
-
-
-				//vec2 textureCoord = { texU, texV };								REWRITE THIS 
-				//vec2 textureCoord = { blockFace[i + 3], blockFace[i + 4] };
-				// sets the vertex position
+				
+				// sets the vertex data
 				vertex.position = vertexPos + glm::vec3(loc);
-				// sets the vertex normal
 				vertex.normal = Blockface::normals[currentFace];
-				// sets the vertex texture coords
-				//glm_vec2_copy(textureCoord, vertex.texcoord);						REWRITE THIS
-				vertex.uv = glm::vec2(0.0, 0.0);
-				//vertex.color[0] = block->color[0];
-				// Sets the vertex color
+				vertex.uv = glm::vec2(texU, texV);
 				vertex.color = glm::vec3(1.0, 1.0, 1.0);
 
 				this->mesh->addVertex(vertex);

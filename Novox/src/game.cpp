@@ -1,5 +1,4 @@
 #define FMT_HEADER_ONLY
-#define STB_IMAGE_IMPLEMENTATION
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <glad/glad.h>
@@ -15,7 +14,7 @@
 #include <stb_image.h>
 
 #include "novox/game.h"
-#include "novox/shader.h"
+#include "novox/rendering.h"
 #include "novox/player.h"
 #include "novox/block.h"
 #include "novox/world.h"
@@ -26,7 +25,7 @@
 
 
 namespace novox {
-	using namespace shader;
+	using namespace rendering;
 
 	int window_width = 800;
 	int window_height = 600;
