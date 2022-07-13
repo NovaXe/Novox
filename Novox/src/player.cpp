@@ -58,11 +58,10 @@ namespace novox{
 		return this->camera;
 	}
 
-	glm::vec3 Player::getSelectionPos()
+	glm::ivec3 Player::getSelectionPos()
 	{
 		const float selection_distance = 2.0;
-		glm::vec3 sel = this->camera->position + this->camera->front * selection_distance;
-		
+		glm::ivec3 sel = glm::floor(this->camera->position + this->camera->front * selection_distance);
 
 		return sel;
 	}

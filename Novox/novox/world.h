@@ -25,7 +25,7 @@ namespace novox::world {
 		Chunk& getChunkAt(int x_coord, int y_coord, int z_coord);
 		Chunk& getChunk(int x_loc, int y_loc, int z_loc);
 
-		void updateConnectedChunks(glm::vec3 position);
+		void updateChunkMesh(Chunk& chunk, const glm::ivec3& position);
 
 		WorldVoxel& getVoxel(int x_coord, int y_coord, int z_coord);
 		WorldVoxel& getVoxel(const glm::vec3& pos);
@@ -39,17 +39,17 @@ namespace novox::world {
 	private:
 		util::Array3D<WorldVoxel> blocks;
 		mesh::ChunkMesh* mesh;
-		glm::vec3 location;
+		glm::ivec3 location;
 		
-		void meshAddCube(World* world, const WorldVoxel& voxel, const glm::vec3& loc);
-		std::array<bool, 6> meshCheckOcclusion(World* world, const glm::vec3& pos);
+		void meshAddCube(World* world, const WorldVoxel& voxel, const glm::ivec3& loc);
+		std::array<bool, 6> meshCheckOcclusion(World* world, const glm::ivec3& pos);
 
 	public:
 		Chunk();
 		void draw(shader::Shader& shader);
 		void tagForRegen();
-		void setLocation(const glm::vec3& location);
-		const glm::vec3& getLocation();
+		void setLocation(const glm::ivec3& location);
+		const glm::ivec3& getLocation();
 		WorldVoxel& getVoxel(int x_loc, int y_loc, int z_loc);
 		void generateMesh(World* world);
 	};

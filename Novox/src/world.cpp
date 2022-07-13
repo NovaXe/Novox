@@ -22,6 +22,7 @@ namespace novox::world {
 				for (int z = 0; z < z_size; z++) {
 					Chunk& chunk = this->chunks.at(x, y, z);
 					chunk.setLocation(glm::ivec3(x, y, z));
+					fmt::print("chunk loc {},{},{}\n", x, y, z);
 					//fmt::print("chunk location set: {},{},{}\t\t", x, y, z);
 					//auto newloc = chunk.getLocation();
 					//fmt::print("chunk new location: {},{},{}\n", newloc.x, newloc.y, newloc.z);
@@ -41,11 +42,55 @@ namespace novox::world {
 
 	Chunk& World::getChunk(int x_loc, int y_loc, int z_loc)
 	{
+		
 		Chunk& chunk = this->chunks.at(x_loc, y_loc, z_loc);
 		return chunk;
 	}
 
-	void World::updateConnectedChunks(glm::vec3 position) {
+	void World::updateChunkMesh(Chunk& chunk, const glm::ivec3& position) {
+		glm::ivec3 chunkPos = chunk.getLocation() * 16;
+		glm::ivec3 offset = position - chunkPos;
+		
+
+		auto checkAndUpdate = [this](glm::ivec3 npos) mutable{
+			if (this->checkBounds(npos)) {
+				this->getChunkAt(npos.x, npos.y, npos.z).tagForRegen();
+			}
+			else {
+				return;
+			}
+		};
+
+
+		chunk.tagForRegen();
+
+		if (offset.x == 0) {
+			glm::ivec3 npos = glm::ivec3(position.x - 1, position.y, position.z);
+			checkAndUpdate(npos);
+		}
+		else if (offset.x == 15) {
+			glm::ivec3 npos = glm::ivec3(position.x + 1, position.y, position.z);
+			checkAndUpdate(npos);
+		}
+
+		if (offset.y == 0) {
+			glm::ivec3 npos = glm::ivec3(position.x, position.y - 1, position.z);
+			checkAndUpdate(npos);
+		}
+		else if (offset.y == 15) {
+			glm::ivec3 npos = glm::ivec3(position.x, position.y + 1, position.z);
+			checkAndUpdate(npos);
+		}
+
+		if (offset.z == 0) {
+			glm::ivec3 npos = glm::ivec3(position.x, position.y, position.z - 1);
+			checkAndUpdate(npos);
+		}
+		else if (offset.z == 15) {
+			glm::ivec3 npos = glm::ivec3(position.x, position.y, position.z + 1);
+			checkAndUpdate(npos);
+		}
+
 
 	}
 
@@ -81,11 +126,11 @@ namespace novox::world {
 		this->location = glm::ivec3(0);
 	}
 	
-	void Chunk::setLocation(const glm::vec3& location)
+	void Chunk::setLocation(const glm::ivec3& location)
 	{
 		this->location = location;
 	}
-	const glm::vec3& Chunk::getLocation()
+	const glm::ivec3& Chunk::getLocation()
 	{
 		return this->location;
 	}
@@ -125,7 +170,7 @@ namespace novox::world {
 		
 	}
 
-	void Chunk::meshAddCube(World* world, const WorldVoxel& voxel, const glm::vec3& loc)
+	void Chunk::meshAddCube(World* world, const WorldVoxel& voxel, const glm::ivec3& loc)
 	{
 		
 		if (voxel.block->block_id == util::as_int(BLOCK::air)) return;
@@ -163,7 +208,7 @@ namespace novox::world {
 				//vec2 textureCoord = { texU, texV };								REWRITE THIS 
 				//vec2 textureCoord = { blockFace[i + 3], blockFace[i + 4] };
 				// sets the vertex position
-				vertex.position = vertexPos + loc;
+				vertex.position = vertexPos + glm::vec3(loc);
 				// sets the vertex normal
 				vertex.normal = Blockface::normals[currentFace];
 				// sets the vertex texture coords
@@ -179,11 +224,11 @@ namespace novox::world {
 	
 	}
 
-	std::array<bool, 6> Chunk::meshCheckOcclusion(World* world, const glm::vec3& loc)
+	std::array<bool, 6> Chunk::meshCheckOcclusion(World* world, const glm::ivec3& loc)
 	{
-		glm::vec3 adjacentLoc;
-		glm::vec3 adjacentPos;
-		glm::vec3 normal;
+		glm::ivec3 adjacentLoc;
+		glm::ivec3 adjacentPos;
+		glm::ivec3 normal;
 
 		std::array<bool, 6> occlude = {};
 
@@ -192,7 +237,7 @@ namespace novox::world {
 			adjacentLoc = loc;								// uses the initial blockposition
 			normal = Blockface::normals[currentFace];		// gets the normal of the current face
 			adjacentLoc += normal;							// adds the normal to the face to get the adjacent block
-			adjacentPos = this->location * 16.0f + adjacentLoc;
+			adjacentPos = this->location * 16 + adjacentLoc;
 			//fmt::print("chunk location: {}, {}, {}", this->location.x, this->location.y, this->location.z);
 			if(world->checkBounds(adjacentPos)) {
 				WorldVoxel& voxel = world->getVoxel(adjacentPos.x, adjacentPos.y, adjacentPos.z);

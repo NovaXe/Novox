@@ -254,7 +254,7 @@ namespace novox {
 		glm::mat4 model = glm::mat4(1.0f);
 		auto sel = this->player->getSelectionPos();
 
-		model = glm::translate(model, glm::floor(sel));
+		model = glm::translate(model, glm::vec3(sel));
 		lightingShader.use();
 		lightingShader.setMat4("model", model);
 		lightingShader.setVec3("objectColor", glm::vec3(0.0));
@@ -322,7 +322,6 @@ if (deltaSec >= 1.0) {
 		{
 			this->player->displaceRelative(-90, 0, speed);
 		}
-
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)		//right
 		{
 			this->player->displaceRelative(90, 0, speed);
@@ -336,12 +335,14 @@ if (deltaSec >= 1.0) {
 			this->player->displaceRelative(0, -90, speed);
 		}
 		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-			auto sel = glm::floor(this->player->getSelectionPos());
-			fmt::print("selection: {}, {}, {}\r", sel.x, sel.y, sel.z);
+			auto sel = this->player->getSelectionPos();
+			if (!this->world->checkBounds(sel)) return;
+			auto chunkloc = this->world->getChunkAt(sel.x, sel.y, sel.z).getLocation();
+			fmt::print("selection: {}, {}, {}\t chunkloc {},{},{}\r", sel.x, sel.y, sel.z, chunkloc.x, chunkloc.y, chunkloc.z);
 		}
 
 		//fmt::print("pos: {}, {}, {}\r", this->player->getPos().x, this->player->getPos().y, this->player->getPos().z);
-
+		
 	}
 
 	void Game::mouseMoved(double xpos, double ypos) {
@@ -373,19 +374,11 @@ if (deltaSec >= 1.0) {
 	}
 
 	void Game::mouseClicked(int button, int action, int mods) {
-		glm::vec3 selpos = glm::floor(this->player->getSelectionPos());
+		glm::ivec3 selpos = this->player->getSelectionPos();
 		if (!this->world->checkBounds(selpos)){
 			return;
 		}
 
-		std::vector<glm::vec3> adjacent = {
-			selpos + glm::vec3(0, 1, 0),
-			selpos + glm::vec3(0, -1, 0),
-			selpos + glm::vec3(1, 0, 0),
-			selpos + glm::vec3(-1, 0, 0),
-			selpos + glm::vec3(0, 0, 1),
-			selpos + glm::vec3(0, 0, -1),
-		};
 
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -393,73 +386,14 @@ if (deltaSec >= 1.0) {
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::air)];
 
 			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
-			chunk.tagForRegen();
-			glm::vec3 chunkMid = chunk.getLocation() * 16.0f + glm::vec3(8);
-			glm::vec3 selectDirection = selpos - chunkMid;
-			if (glm::abs(selectDirection.x) == 8 || glm::abs(selectDirection.y) == 8 || glm::abs(selectDirection.z) == 8) {
-				glm::vec3 offset = glm::ivec3(selectDirection / 8);
-
-				if (offset.x != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x + offset.x, selpos.y, selpos.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				if (offset.y != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x, selpos.y + offset.y, selpos.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				if (offset.z != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x, selpos.y, selpos.z + offset.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				
-			}
-
-			
-
-
+			this->world->updateChunkMesh(chunk, selpos);
 		}
 		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::stone)];
 
 			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
-			chunk.tagForRegen();
-			glm::vec3 chunkMid = chunk.getLocation() * 16.0f + glm::vec3(8);
-			glm::vec3 selectDirection = selpos - chunkMid;
-
-			if (glm::abs(selectDirection.x) == 8) {
-				
-			}
-			if (glm::abs(selectDirection.y) == 8) {
-
-			}
-			if (glm::abs(selectDirection.z) == 8) {
-
-			}
-
-			if (glm::abs(selectDirection.x) == 8 || glm::abs(selectDirection.y) == 8 || glm::abs(selectDirection.z) == 8) {
-				glm::vec3 offset = glm::ivec3(selectDirection / 8);
-				
-				if (offset.x != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x + offset.x, selpos.y, selpos.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				if (offset.y != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x, selpos.y + offset.y, selpos.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				if (offset.z != 0) {
-					auto& nc = this->world->getChunkAt(selpos.x, selpos.y, selpos.z + offset.z);
-					nc.tagForRegen();
-					fmt::print("regenerated neighbor mesh\n");
-				}
-				
-			}
+			this->world->updateChunkMesh(chunk, selpos);
 		}
 	}
 
