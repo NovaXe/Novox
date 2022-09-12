@@ -47,6 +47,9 @@ namespace novox {
 		glm::mat4 getView();
 		Camera* getCamera();
 
+		glm::ivec3 selectionPos;
+		bool blockSelected;
+
 		glm::ivec3 getSelectionPos();
 
 		void lookTowards(float yaw, float pitch);

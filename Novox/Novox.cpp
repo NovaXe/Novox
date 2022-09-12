@@ -21,8 +21,8 @@ int main()
 
     while (!glfwWindowShouldClose(game->window)) {
 
-        game->render();
         game->tick();
+        game->render();
 
     }
 

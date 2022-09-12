@@ -1,10 +1,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#define NOMINMAX
 #include <windows.h>
 #include <fmt/core.h>
 
 #include <array>
+#include <vector>
 //#include <cmath>
 #include <stdexcept>
 
@@ -16,7 +18,7 @@
 namespace novox::world {
 	
 
-	World::World(int x_size, int y_size, int z_size) : chunks(x_size, y_size, z_size) {
+	World::World(int x_size, int y_size, int z_size) : chunks(x_size, y_size, z_size), x_size(x_size), y_size(y_size), z_size(z_size) {
 		for (int x = 0; x < x_size; x++) {
 			for (int y = 0; y < y_size; y++) {
 				for (int z = 0; z < z_size; z++) {
@@ -117,6 +119,102 @@ namespace novox::world {
 		}
 	}
 
+	std::vector<std::pair<glm::ivec3, WorldVoxel>> World::castVoxelRay(const glm::vec3& start, const glm::vec3& end) {
+		
+		float voxel_size = 1.0;
+		//glm::ivec3 endBound
+
+		std::vector<std::pair<glm::ivec3, WorldVoxel>> intersectedVoxels;
+
+		auto appendVoxel = [&](glm::ivec3 pos) {
+			if (this->checkBounds(pos)) {
+				auto pair = std::make_pair(pos, this->getVoxel(pos));
+				intersectedVoxels.push_back(pair);
+			}
+		};
+
+		auto rayDirection = glm::normalize(end - start);
+
+
+
+		int rayX = 0;
+		int rayY = 0;
+		int rayZ = 0;
+		glm::ivec3 currentVoxel = {0,0,0};
+
+		
+		if (start.x >= 0) {
+			currentVoxel.x = glm::floor(start.x);
+		}
+		if (start.y >= 0) {
+			currentVoxel.y = glm::floor(start.y);
+		}
+		if (start.z >= 0) {
+			currentVoxel.z = glm::floor(start.z);
+		}
+
+		auto firstVoxel = currentVoxel;
+		auto lastVoxel = glm::ivec3(glm::floor(end));
+
+		appendVoxel(firstVoxel);
+
+
+		
+
+
+		int stepX = (rayDirection.x < 0) ? -1 : 1 * voxel_size;
+		int stepY = (rayDirection.y < 0) ? -1 : 1 * voxel_size;
+		int stepZ = (rayDirection.z < 0) ? -1 : 1 * voxel_size;
+
+
+
+		float tMaxX = (rayDirection.x != 0) ? (currentVoxel.x + stepX - start.x) / (end - start).x : FLT_MAX;
+		float tMaxY = (rayDirection.y != 0) ? (currentVoxel.y + stepY - start.y) / (end - start).y : FLT_MAX;
+		float tMaxZ = (rayDirection.z != 0) ? (currentVoxel.z + stepZ - start.z) / (end - start).z : FLT_MAX;
+
+		
+
+
+		float tDeltaX = (rayDirection.x != 0) ? 1 / (end - start).x * voxel_size * stepX: FLT_MAX;
+		float tDeltaY = (rayDirection.y != 0) ? 1 / (end - start).y * voxel_size * stepY: FLT_MAX;
+		float tDeltaZ = (rayDirection.z != 0) ? 1 / (end - start).z * voxel_size * stepZ: FLT_MAX;
+
+		int count = 0;
+
+		do {
+			if (tMaxX < tMaxY) {
+				if (tMaxX < tMaxZ) {
+					currentVoxel.x += stepX;
+					if (currentVoxel.x == this->x_size * 16 || currentVoxel.x < 0) break; /* outside grid */
+					tMaxX = tMaxX + tDeltaX;
+				}
+				else {
+					currentVoxel.z += stepZ;
+					if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
+					tMaxZ = tMaxZ + tDeltaZ;
+				}
+			}
+			else {
+				if (tMaxY < tMaxZ) {
+					currentVoxel.y += stepY;
+					if (currentVoxel.y == this->y_size * 16 || currentVoxel.y < 0) break;
+					tMaxY = tMaxY + tDeltaY;
+				}
+				else {
+					currentVoxel.z += stepZ;
+					if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
+					tMaxZ = tMaxZ + tDeltaZ;
+				}
+			}
+			appendVoxel(currentVoxel);
+			
+		} while (currentVoxel != lastVoxel);
+
+		appendVoxel(lastVoxel);
+
+		return intersectedVoxels;
+
+	}
 	
 	
 

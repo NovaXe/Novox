@@ -21,6 +21,9 @@ namespace novox::world {
 		util::Array3D<Chunk> chunks;
 	public:
 		World(int x_size, int y_size, int z_size);
+		int x_size;
+		int y_size;
+		int z_size;
 
 		Chunk& getChunkAt(int x_coord, int y_coord, int z_coord);
 		Chunk& getChunk(int x_loc, int y_loc, int z_loc);
@@ -30,6 +33,7 @@ namespace novox::world {
 		WorldVoxel& getVoxel(int x_coord, int y_coord, int z_coord);
 		WorldVoxel& getVoxel(const glm::vec3& pos);
 		bool checkBounds(const glm::vec3& pos);
+		std::vector<std::pair<glm::ivec3, WorldVoxel>> castVoxelRay(const glm::vec3& start, const glm::vec3& end);
 	};
 
 

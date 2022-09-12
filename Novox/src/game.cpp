@@ -27,8 +27,8 @@
 namespace novox {
 	using namespace rendering;
 
-	int window_width = 800;
-	int window_height = 600;
+	int window_width = 800 * 2;
+	int window_height = 600 * 2;
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -251,7 +251,7 @@ namespace novox {
 		}
 
 		glm::mat4 model = glm::mat4(1.0f);
-		auto sel = this->player->getSelectionPos();
+		auto sel = this->player->selectionPos;
 
 		model = glm::translate(model, glm::vec3(sel));
 		lightingShader.use();
@@ -260,7 +260,7 @@ namespace novox {
 
 		glDisable(GL_CULL_FACE);
 
-		if (1) {
+		if (this->player->blockSelected) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glLineWidth(4);
 			glBindVertexArray(selectionVAO);
@@ -273,16 +273,16 @@ namespace novox {
 		
 		
 		glfwSwapBuffers(this->window);
-glfwPollEvents();
+		glfwPollEvents();
 
-static float deltaSec = 0.0;
-//fmt::print(stderr, "lastsec {}\n", deltaSec);
-deltaSec += deltaTime;
-if (deltaSec >= 1.0) {
-	glfwSetWindowTitle(this->window, fmt::format("Novox: {} FPS", frame_count).c_str());
-	frame_count = 0;
-	deltaSec = 0.0;
-}
+		static float deltaSec = 0.0;
+		//fmt::print(stderr, "lastsec {}\n", deltaSec);
+		deltaSec += deltaTime;
+		if (deltaSec >= 1.0) {
+			glfwSetWindowTitle(this->window, fmt::format("Novox: {} FPS", frame_count).c_str());
+			frame_count = 0;
+			deltaSec = 0.0;
+		}
 
 
 
@@ -290,6 +290,24 @@ if (deltaSec >= 1.0) {
 
 	void Game::tick() {
 		processInput();
+		
+		// Player selection processing
+		auto playerCameraPos = this->player->getCamera()->position;
+		auto playerCameraDir = this->player->getCamera()->front;
+		float maxSelectionDistance = 5;
+
+		bool blockSelected = false;
+
+		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
+		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
+			if (voxel.block->block_id != 0) {
+				this->player->selectionPos = voxelPos;
+				blockSelected = true;
+				break;
+			}
+		}
+		this->player->blockSelected = blockSelected;
+
 	}
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -334,7 +352,7 @@ if (deltaSec >= 1.0) {
 			this->player->displaceRelative(0, -90, speed);
 		}
 		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-			auto sel = this->player->getSelectionPos();
+			auto sel = this->player->selectionPos;
 			if (!this->world->checkBounds(sel)) return;
 			auto chunkloc = this->world->getChunkAt(sel.x, sel.y, sel.z).getLocation();
 			fmt::print("selection: {}, {}, {}\t chunkloc {},{},{}\r", sel.x, sel.y, sel.z, chunkloc.x, chunkloc.y, chunkloc.z);
@@ -373,7 +391,7 @@ if (deltaSec >= 1.0) {
 	}
 
 	void Game::mouseClicked(int button, int action, int mods) {
-		glm::ivec3 selpos = this->player->getSelectionPos();
+		glm::ivec3 selpos = this->player->selectionPos;
 		if (!this->world->checkBounds(selpos)){
 			return;
 		}
