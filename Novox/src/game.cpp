@@ -325,7 +325,7 @@ namespace novox {
 	}
 
 	void Game::tick() {
-		processInput();
+		
 		
 		// Player selection processing
 		auto playerCameraPos = this->player->getCamera()->position;

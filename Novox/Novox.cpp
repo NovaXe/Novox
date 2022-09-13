@@ -21,6 +21,7 @@ int main()
 
     while (!glfwWindowShouldClose(game->window)) {
 
+        game->processInput();
         game->tick();
         game->render();
 

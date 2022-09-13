@@ -115,7 +115,7 @@ namespace novox::world {
 			return false;
 		}
 		else {
-			return chunks.inRange(pos.x / 16, pos.y / 16, pos.z / 16);
+			return chunks.inRange(std::floor(pos.x / 16), std::floor(pos.y / 16), std::floor(pos.z / 16));
 		}
 	}
 
