@@ -25,10 +25,15 @@
 
 
 namespace novox {
+
+	glm::vec3 rayStartPos(0.0f);
+	glm::vec3 rayEndPos(0.0f);
+	std::vector<glm::ivec3> rayIntersections;
+
 	using namespace rendering;
 
-	int window_width = 800 * 2;
-	int window_height = 600 * 2;
+	int window_width = 800;
+	int window_height = 600;
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -260,14 +265,45 @@ namespace novox {
 
 		glDisable(GL_CULL_FACE);
 
+
+
+
+
 		if (this->player->blockSelected) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glLineWidth(4);
 			glBindVertexArray(selectionVAO);
+
 			glDrawArrays(GL_TRIANGLES, 0, 36);
+			/*lightingShader.use();
+			model = glm::translate(glm::mat4(1.0f), glm::floor(rayStartPos));
+			lightingShader.setMat4("model", model);
+			lightingShader.setVec3("objectColor", glm::vec3(0.0, 1.0, 0.0));
+			glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+			
+
+			/*lightingShader.use();
+			model = glm::translate(glm::mat4(1.0f), glm::floor(rayEndPos));
+			lightingShader.setMat4("model", model);
+			lightingShader.setVec3("objectColor", glm::vec3(1.0, 0.0, 0.0));
+			glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
 			glLineWidth(1);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
 		}
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		for (auto const& pos : rayIntersections) {
+			lightingShader.use();
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(pos));
+			lightingShader.setMat4("model", model);
+			lightingShader.setVec3("objectColor", glm::vec3(0.0, 0.0, 0.0));
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
 		glEnable(GL_CULL_FACE);
 		//fmt::print(stderr, "rendered chunks\n");
 		
@@ -294,12 +330,23 @@ namespace novox {
 		// Player selection processing
 		auto playerCameraPos = this->player->getCamera()->position;
 		auto playerCameraDir = this->player->getCamera()->front;
-		float maxSelectionDistance = 5;
+		float maxSelectionDistance = 8;
 
 		bool blockSelected = false;
 
+		rayStartPos = playerCameraPos;
+		rayEndPos = playerCameraPos + playerCameraDir * maxSelectionDistance;
+
 		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
+		//auto playerSelectedVoxels = this->world->castVoxelRay(glm::vec3(0.0, 0.0, 0.5), glm::vec3(32.0,32.0,0.5));
+		rayIntersections.clear();
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
+			rayIntersections.push_back(voxelPos);
+		}
+
+		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
+			
+			fmt::print("<{:02}, {:02}, {:02}>\t:\t[ {} ]\t[{:02}]\n", voxelPos.x, voxelPos.y, voxelPos.z, voxel.block->block_id, playerSelectedVoxels.size());
 			if (voxel.block->block_id != 0) {
 				this->player->selectionPos = voxelPos;
 				blockSelected = true;
@@ -355,7 +402,7 @@ namespace novox {
 			auto sel = this->player->selectionPos;
 			if (!this->world->checkBounds(sel)) return;
 			auto chunkloc = this->world->getChunkAt(sel.x, sel.y, sel.z).getLocation();
-			fmt::print("selection: {}, {}, {}\t chunkloc {},{},{}\r", sel.x, sel.y, sel.z, chunkloc.x, chunkloc.y, chunkloc.z);
+			fmt::print("selection: {:02}, {:02}, {:02}\t chunkloc {:02},{:02},{:02}\r", sel.x, sel.y, sel.z, chunkloc.x, chunkloc.y, chunkloc.z);
 		}
 
 		//fmt::print("pos: {}, {}, {}\r", this->player->getPos().x, this->player->getPos().y, this->player->getPos().z);

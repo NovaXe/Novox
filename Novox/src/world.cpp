@@ -131,26 +131,40 @@ namespace novox::world {
 				auto pair = std::make_pair(pos, this->getVoxel(pos));
 				intersectedVoxels.push_back(pair);
 			}
+			else {
+				auto pair = std::make_pair(pos, WorldVoxel(Block::defaultBlocks[0]));
+				intersectedVoxels.push_back(pair);
+			}
 		};
 
+		auto ray = end - start;
 		auto rayDirection = glm::normalize(end - start);
 
 
 
-		int rayX = 0;
-		int rayY = 0;
-		int rayZ = 0;
+		
 		glm::ivec3 currentVoxel = {0,0,0};
 
 		
+		//currentVoxel = glm::floor(start);
+
 		if (start.x >= 0) {
 			currentVoxel.x = glm::floor(start.x);
+		}
+		else {
+			currentVoxel.x = glm::ceil(start.x);
 		}
 		if (start.y >= 0) {
 			currentVoxel.y = glm::floor(start.y);
 		}
+		else {
+			currentVoxel.y = glm::ceil(start.y);
+		}
 		if (start.z >= 0) {
 			currentVoxel.z = glm::floor(start.z);
+		}
+		else {
+			currentVoxel.z = glm::ceil(start.z);
 		}
 
 		auto firstVoxel = currentVoxel;
@@ -162,22 +176,38 @@ namespace novox::world {
 		
 
 
-		int stepX = (rayDirection.x < 0) ? -1 : 1 * voxel_size;
-		int stepY = (rayDirection.y < 0) ? -1 : 1 * voxel_size;
-		int stepZ = (rayDirection.z < 0) ? -1 : 1 * voxel_size;
+		int stepX = (rayDirection.x < 0) ? -1 : (rayDirection.x == 0) ? 0 : 1 * voxel_size;
+		int stepY = (rayDirection.y < 0) ? -1 : (rayDirection.y == 0) ? 0 : 1 * voxel_size;
+		int stepZ = (rayDirection.z < 0) ? -1 : (rayDirection.z == 0) ? 0 : 1 * voxel_size;
 
 
-
-		float tMaxX = (rayDirection.x != 0) ? (currentVoxel.x + stepX - start.x) / (end - start).x : FLT_MAX;
-		float tMaxY = (rayDirection.y != 0) ? (currentVoxel.y + stepY - start.y) / (end - start).y : FLT_MAX;
-		float tMaxZ = (rayDirection.z != 0) ? (currentVoxel.z + stepZ - start.z) / (end - start).z : FLT_MAX;
-
-		
+		//float tMaxX = (rayDirection.x != 0) ? (std::max(0.0f, glm::ceil(start.x)) - start.x) / rayDirection.x : FLT_MAX;
+		//float tMaxY = (rayDirection.y != 0) ? (std::max(0.0f, glm::ceil(start.y)) - start.y) / rayDirection.y : FLT_MAX;
+		//float tMaxZ = (rayDirection.z != 0) ? (std::max(0.0f, glm::ceil(start.z)) - start.z) / rayDirection.z : FLT_MAX;
 
 
-		float tDeltaX = (rayDirection.x != 0) ? 1 / (end - start).x * voxel_size * stepX: FLT_MAX;
-		float tDeltaY = (rayDirection.y != 0) ? 1 / (end - start).y * voxel_size * stepY: FLT_MAX;
-		float tDeltaZ = (rayDirection.z != 0) ? 1 / (end - start).z * voxel_size * stepZ: FLT_MAX;
+		//float tMaxX = (rayDirection.x != 0) ? (currentVoxel.x + stepX - start.x) / (end - start).x : FLT_MAX;
+		//float tMaxY = (rayDirection.y != 0) ? (currentVoxel.y + stepY - start.y) / (end - start).y : FLT_MAX;
+		//float tMaxZ = (rayDirection.z != 0) ? (currentVoxel.z + stepZ - start.z) / (end - start).z : FLT_MAX;
+		// 
+		// cudos to stack overflow dude "ProjectPhysX"
+		float tDeltaX = (stepX != 0) ? glm::min(stepX / (ray.x), FLT_MAX) : FLT_MAX;
+		float tMaxX = (stepX > 0) ? tDeltaX * glm::fract(start.x) : tDeltaX * (1.0 - glm::fract(start.x));
+
+		float tDeltaY = (stepY != 0) ? glm::min(stepY / (ray.y), FLT_MAX) : FLT_MAX;
+		float tMaxY = (stepY > 0) ? tDeltaY * glm::fract(start.y) : tDeltaY * (1.0 - glm::fract(start.y));
+
+		float tDeltaZ = (stepZ != 0) ? glm::min(stepZ / (ray.z), FLT_MAX) : FLT_MAX;
+		float tMaxZ = (stepZ > 0) ? tDeltaZ * glm::fract(start.z) : tDeltaZ * (1.0 - glm::fract(start.z));
+
+		/*float tDeltaX = (rayDirection.x != 0) ? 1 / rayDirection.x * voxel_size: FLT_MAX;
+		float tDeltaY = (rayDirection.y != 0) ? 1 / rayDirection.y * voxel_size: FLT_MAX;
+		float tDeltaZ = (rayDirection.z != 0) ? 1 / rayDirection.z * voxel_size: FLT_MAX;
+		*/
+		/*float tMaxX = tDeltaX * (1.0 - glm::fract(start.x));
+		float tMaxY = tDeltaY * (1.0 - glm::fract(start.y));
+		float tMaxZ = tDeltaZ * (1.0 - glm::fract(start.z));*/
+
 
 		int count = 0;
 
@@ -185,31 +215,31 @@ namespace novox::world {
 			if (tMaxX < tMaxY) {
 				if (tMaxX < tMaxZ) {
 					currentVoxel.x += stepX;
-					if (currentVoxel.x == this->x_size * 16 || currentVoxel.x < 0) break; /* outside grid */
-					tMaxX = tMaxX + tDeltaX;
+					//if (currentVoxel.x == this->x_size * 16 || currentVoxel.x < 0) break; /* outside grid */
+					tMaxX += tDeltaX;
 				}
 				else {
 					currentVoxel.z += stepZ;
-					if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
-					tMaxZ = tMaxZ + tDeltaZ;
+					//if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
+					tMaxZ += tDeltaZ;
 				}
 			}
 			else {
 				if (tMaxY < tMaxZ) {
 					currentVoxel.y += stepY;
-					if (currentVoxel.y == this->y_size * 16 || currentVoxel.y < 0) break;
-					tMaxY = tMaxY + tDeltaY;
+					//if (currentVoxel.y == this->y_size * 16 || currentVoxel.y < 0) break;
+					tMaxY += tDeltaY;
 				}
 				else {
 					currentVoxel.z += stepZ;
-					if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
-					tMaxZ = tMaxZ + tDeltaZ;
+					//if (currentVoxel.z == this->z_size * 16 || currentVoxel.z < 0) break;
+					tMaxZ += tDeltaZ;
 				}
 			}
 			appendVoxel(currentVoxel);
 			
-		} while (currentVoxel != lastVoxel);
-
+		} while (tMaxX <= 1 && tMaxY <= 1 && tMaxZ <= 1);
+		//currentVoxel != lastVoxel
 		appendVoxel(lastVoxel);
 
 		return intersectedVoxels;

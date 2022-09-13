@@ -15,8 +15,8 @@ uniform sampler2D objectTexture;
 
 void main()
 {
-    float ambientStrength = 0.2f;
-    float specularStrength = 0.5f;
+    float ambientStrength = 0.4f;
+    float specularStrength = 0.4f;
     vec3 ambient = ambientStrength * lightColor;
     
     
