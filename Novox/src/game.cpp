@@ -276,7 +276,7 @@ namespace novox {
 
 
 
-		glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
 
 		if (this->player->blockSelected) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -305,20 +305,20 @@ namespace novox {
 		}
 		//glDisable(GL_DEPTH_TEST);
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (auto const& pos : rayIntersections) {
 			lightingShader.use();
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(pos));
 			lightingShader.setMat4("model", model);
 			lightingShader.setVec3("objectColor", glm::vec3(0.0, 0.0, 0.0));
 			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		}*/
 
 		glEnable(GL_CULL_FACE);
 		//fmt::print(stderr, "rendered chunks\n");
 		
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		
+		glDisable(GL_DEPTH_TEST);
 		auto playerCameraPos = this->player->getCamera()->position;
 		auto playerCameraDir = this->player->getCamera()->front;
 		float maxSelectionDistance = 8;
@@ -328,7 +328,7 @@ namespace novox {
 		lineShader.use();
 		lineShader.setMat4("view", view);
 		lineShader.setMat4("projection", projection);
-		lineRenderer.drawLine(playerCameraPos, glm::vec3(31.5f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//lineRenderer.drawLine(playerCameraPos, glm::vec3(31.5f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 
 		
@@ -375,8 +375,8 @@ namespace novox {
 		rayStartPos = playerCameraPos;
 		rayEndPos = playerCameraPos + playerCameraDir * maxSelectionDistance;
 
-		//auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
-		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, glm::vec3(31.5f));
+		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
+		//auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, glm::vec3(31.5f));
 		rayIntersections.clear();
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
 			rayIntersections.push_back(voxelPos);

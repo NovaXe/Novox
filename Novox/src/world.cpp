@@ -241,7 +241,7 @@ namespace novox::world {
 			}
 			appendVoxel(currentVoxel);
 			
-		} while (tMaxX <= 1 && tMaxY <= 1 && tMaxZ <= 1);
+		} while (currentVoxel != lastVoxel);
 		//currentVoxel != lastVoxel
 		appendVoxel(lastVoxel);
 
