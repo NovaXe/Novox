@@ -123,7 +123,6 @@ namespace novox::world {
 		
 		float voxel_size = 1.0;
 		//glm::ivec3 endBound
-
 		std::vector<std::pair<glm::ivec3, WorldVoxel>> intersectedVoxels;
 
 		auto appendVoxel = [&](glm::ivec3 pos) {
@@ -138,13 +137,14 @@ namespace novox::world {
 		};
 
 		auto ray = end - start;
-		auto rayDirection = glm::normalize(end - start);
+		auto rayDirection = glm::normalize(ray);
 
 
 
 		
 		glm::ivec3 currentVoxel = {0,0,0};
 
+		//start = start + glm::vec3(0.5);
 		
 		//currentVoxel = glm::floor(start);
 
@@ -190,15 +190,18 @@ namespace novox::world {
 		//float tMaxY = (rayDirection.y != 0) ? (currentVoxel.y + stepY - start.y) / (end - start).y : FLT_MAX;
 		//float tMaxZ = (rayDirection.z != 0) ? (currentVoxel.z + stepZ - start.z) / (end - start).z : FLT_MAX;
 		// 
-		// cudos to stack overflow dude "ProjectPhysX"
+		// 
+#define FRAC0(x) (x - floorf(x))
+#define FRAC1(x) (1 - x + floorf(x))
+		// kudos to stack overflow dude "ProjectPhysX"
 		float tDeltaX = (stepX != 0) ? glm::min(stepX / (ray.x), FLT_MAX) : FLT_MAX;
-		float tMaxX = (stepX > 0) ? tDeltaX * glm::fract(start.x) : tDeltaX * (1.0 - glm::fract(start.x));
+		float tMaxX = (stepX > 0) ? tDeltaX * FRAC1(start.x) : tDeltaX * FRAC0(start.x);
 
 		float tDeltaY = (stepY != 0) ? glm::min(stepY / (ray.y), FLT_MAX) : FLT_MAX;
-		float tMaxY = (stepY > 0) ? tDeltaY * glm::fract(start.y) : tDeltaY * (1.0 - glm::fract(start.y));
+		float tMaxY = (stepY > 0) ? tDeltaY * FRAC1(start.y) : tDeltaY * FRAC0(start.y);
 
 		float tDeltaZ = (stepZ != 0) ? glm::min(stepZ / (ray.z), FLT_MAX) : FLT_MAX;
-		float tMaxZ = (stepZ > 0) ? tDeltaZ * glm::fract(start.z) : tDeltaZ * (1.0 - glm::fract(start.z));
+		float tMaxZ = (stepZ > 0) ? tDeltaZ * FRAC1(start.z) : tDeltaZ * FRAC0(start.z);
 
 		/*float tDeltaX = (rayDirection.x != 0) ? 1 / rayDirection.x * voxel_size: FLT_MAX;
 		float tDeltaY = (rayDirection.y != 0) ? 1 / rayDirection.y * voxel_size: FLT_MAX;

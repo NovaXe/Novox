@@ -59,8 +59,8 @@ namespace novox::mesh {
 	void ChunkMesh::draw(rendering::Shader& shader, const glm::vec3& loc)
 	{
 		static rendering::Texture textureAtlas("textures/TextureAtlas.png");
-		textureAtlas.bind();
 		shader.use();
+		textureAtlas.bind();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, loc * 16.0f);
 		shader.setMat4("model", model);

@@ -47,5 +47,18 @@ namespace rendering {
 		void bind();
 	};
 
+	class SpriteRenderer {
+	private:
+		Shader& shader;
+		void initRenderData();
+		GLuint quadVAO;
 
+
+	public:
+		SpriteRenderer(Shader& shader);
+		~SpriteRenderer();
+
+		void drawSprite(Texture& texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color);
+
+	};
 }

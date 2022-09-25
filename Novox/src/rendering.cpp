@@ -128,12 +128,18 @@ namespace rendering {
 		glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 	}
 
+
+
+
 	GLuint Texture::load()
 	{
 		//static bool run_once = []()->bool {stbi_set_flip_vertically_on_load(true); return true; }();
 
 		GLuint texid = 0;
 		glGenTextures(1, &texid);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texid);
+		
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -143,7 +149,7 @@ namespace rendering {
 		int width, height, nrChannels;
 
 		static unsigned char* imgData;
-		imgData = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
+		imgData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
 		if (imgData != NULL) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
@@ -154,7 +160,7 @@ namespace rendering {
 			fmt::print("Failed to load Texture\n");
 		}
 		stbi_image_free(imgData);
-		glBindTexture(GL_TEXTURE_2D, texid);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		return texid;
 	}
@@ -167,8 +173,77 @@ namespace rendering {
 
 	void Texture::bind()
 	{
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, this->ID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->ID);
+	}
+
+	void SpriteRenderer::initRenderData()
+	{
+		GLuint VBO;
+		float vertices[] = {
+			// pos      // tex
+			0.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+
+			0.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f, 0.0f, 1.0f, 0.0f
+		};
+
+		glGenVertexArrays(1, &this->quadVAO);
+		glGenBuffers(1, &VBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindVertexArray(this->quadVAO);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2*sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+
+	}
+
+	SpriteRenderer::SpriteRenderer(Shader& shader) : shader(shader)
+	{
+		initRenderData();
+	}
+
+	SpriteRenderer::~SpriteRenderer()
+	{
+		glDeleteVertexArrays(1, &this->quadVAO);
+	}
+
+	void SpriteRenderer::drawSprite(Texture& texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color) 
+	{
+		this->shader.use();
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(pos, 0.0f));
+
+		model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f));
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
+		
+		model = glm::scale(model, glm::vec3(size, 1.0f));
+
+		this->shader.setMat4("model", model);
+		this->shader.setVec3("spriteColor", color);
+
+		glActiveTexture(GL_TEXTURE0);
+		texture.bind();
+
+
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(this->quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+
+
+
 	}
 
 }

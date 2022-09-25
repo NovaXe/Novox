@@ -85,9 +85,14 @@
     <None Include="shaders\LightSource.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\SpriteShader.vert" />
+    <None Include="shaders\SpriteShader.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\TextureAtlas.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="textures\Crosshair.png">
       <Filter>Textures</Filter>
     </Image>
   </ItemGroup>

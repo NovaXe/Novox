@@ -167,12 +167,15 @@ xcopy /Y "$(ProjectDir)shaders" "$(OutDir)\shaders\"</Command>
     <ClInclude Include="novox\world.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\SpriteShader.frag" />
+    <None Include="shaders\SpriteShader.vert" />
     <None Include="shaders\LightingShader.frag" />
     <None Include="shaders\LightingShader.vert" />
     <None Include="shaders\LightSource.frag" />
     <None Include="shaders\LightSource.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="textures\Crosshair.png" />
     <Image Include="textures\TextureAtlas.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

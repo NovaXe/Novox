@@ -32,8 +32,8 @@ namespace novox {
 
 	using namespace rendering;
 
-	int window_width = 800;
-	int window_height = 600;
+	int window_width = 800 * 2;
+	int window_height = 600 * 2;
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -120,6 +120,11 @@ namespace novox {
 	void Game::render() {
 		static Shader lightingShader("shaders/LightingShader.vert", "shaders/LightingShader.frag");
 		static Shader lightSourceShader("shaders/LightSource.vert", "shaders/LightSource.frag");
+		static Shader spriteShader("shaders/SpriteShader.vert", "shaders/SpriteShader.frag");
+		static SpriteRenderer spriteRenderer(spriteShader);
+		spriteShader.setMat4("projection", glm::ortho(0.0f, (float)window_width, (float)window_height, 0.0f, -1.0f, 1.0f));
+		static Texture crosshair("textures/Crosshair.png");
+		
 
 		static float cube_vertices[] = {
 			// vertices				// Texture Coords	// Normal Vectors
@@ -234,7 +239,7 @@ namespace novox {
 
 		lightingShader.setVec3("lightColor", glm::vec3(1.0, 1.0, 1.0));
 		lightingShader.setVec3("lightPos", glm::vec3(WORLD_SIZE * 16, WORLD_SIZE * 16 + 8, WORLD_SIZE * 16));
-		lightingShader.setVec3("viewPos", glm::vec3(0, 0, 0));
+		lightingShader.setVec3("viewPos", this->player->getCamera()->position);
 
 		for (int x = 0; x < WORLD_SIZE; x++) {
 			for (int y = 0; y < WORLD_SIZE; y++) {
@@ -294,6 +299,7 @@ namespace novox {
 
 
 		}
+		//glDisable(GL_DEPTH_TEST);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (auto const& pos : rayIntersections) {
@@ -307,6 +313,15 @@ namespace novox {
 		glEnable(GL_CULL_FACE);
 		//fmt::print(stderr, "rendered chunks\n");
 		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		
+		spriteRenderer.drawSprite(crosshair, glm::vec2((float)window_width / 2 - 16, (float)window_height / 2 - 16), glm::vec2(32.0f, 32.0f), 0.0f, glm::vec3(1.0f));
+
+		glEnable(GL_DEPTH_TEST);
+		
+
+		
+
 		
 		glfwSwapBuffers(this->window);
 		glfwPollEvents();
@@ -338,7 +353,7 @@ namespace novox {
 		rayEndPos = playerCameraPos + playerCameraDir * maxSelectionDistance;
 
 		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
-		//auto playerSelectedVoxels = this->world->castVoxelRay(glm::vec3(0.0, 0.0, 0.5), glm::vec3(32.0,32.0,0.5));
+		//auto playerSelectedVoxels = this->world->castVoxelRay(glm::vec3(0.0, 31.0, 0.0), glm::vec3(16.0,31.0,16.0));
 		rayIntersections.clear();
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
 			rayIntersections.push_back(voxelPos);
