@@ -121,10 +121,14 @@ namespace novox {
 		static Shader lightingShader("shaders/LightingShader.vert", "shaders/LightingShader.frag");
 		static Shader lightSourceShader("shaders/LightSource.vert", "shaders/LightSource.frag");
 		static Shader spriteShader("shaders/SpriteShader.vert", "shaders/SpriteShader.frag");
+		static Shader lineShader("shaders/LineShader.vert", "shaders/LineShader.frag");
+		
+		static LineRenderer lineRenderer(lineShader);
 		static SpriteRenderer spriteRenderer(spriteShader);
-		spriteShader.setMat4("projection", glm::ortho(0.0f, (float)window_width, (float)window_height, 0.0f, -1.0f, 1.0f));
+		
 		static Texture crosshair("textures/Crosshair.png");
 		
+
 
 		static float cube_vertices[] = {
 			// vertices				// Texture Coords	// Normal Vectors
@@ -272,7 +276,7 @@ namespace novox {
 
 
 
-
+		glDisable(GL_DEPTH_TEST);
 
 		if (this->player->blockSelected) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -315,6 +319,25 @@ namespace novox {
 		
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
+		auto playerCameraPos = this->player->getCamera()->position;
+		auto playerCameraDir = this->player->getCamera()->front;
+		float maxSelectionDistance = 8;
+
+
+		
+		lineShader.use();
+		lineShader.setMat4("view", view);
+		lineShader.setMat4("projection", projection);
+		lineRenderer.drawLine(playerCameraPos, glm::vec3(31.5f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+
+		
+
+		
+
+
+		spriteShader.use();
+		spriteShader.setMat4("projection", glm::ortho(0.0f, (float)window_width, (float)window_height, 0.0f, -1.0f, 1.0f));
 		spriteRenderer.drawSprite(crosshair, glm::vec2((float)window_width / 2 - 16, (float)window_height / 2 - 16), glm::vec2(32.0f, 32.0f), 0.0f, glm::vec3(1.0f));
 
 		glEnable(GL_DEPTH_TEST);
@@ -352,8 +375,8 @@ namespace novox {
 		rayStartPos = playerCameraPos;
 		rayEndPos = playerCameraPos + playerCameraDir * maxSelectionDistance;
 
-		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
-		//auto playerSelectedVoxels = this->world->castVoxelRay(glm::vec3(0.0, 31.0, 0.0), glm::vec3(16.0,31.0,16.0));
+		//auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, playerCameraPos + playerCameraDir * maxSelectionDistance);
+		auto playerSelectedVoxels = this->world->castVoxelRay(playerCameraPos, glm::vec3(31.5f));
 		rayIntersections.clear();
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
 			rayIntersections.push_back(voxelPos);
@@ -361,7 +384,7 @@ namespace novox {
 
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
 			
-			fmt::print("<{:02}, {:02}, {:02}>\t:\t[ {} ]\t[{:02}]\n", voxelPos.x, voxelPos.y, voxelPos.z, voxel.block->block_id, playerSelectedVoxels.size());
+			//fmt::print("<{:02}, {:02}, {:02}>\t:\t[ {} ]\t[{:02}]\n", voxelPos.x, voxelPos.y, voxelPos.z, voxel.block->block_id, playerSelectedVoxels.size());
 			if (voxel.block->block_id != 0) {
 				this->player->selectionPos = voxelPos;
 				blockSelected = true;

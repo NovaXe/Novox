@@ -61,4 +61,19 @@ namespace rendering {
 		void drawSprite(Texture& texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color);
 
 	};
+
+	class LineRenderer {
+	private:
+		Shader& shader;
+		void initRenderData();
+		GLuint lineVAO;
+		
+	public:
+		LineRenderer(Shader& shader);
+		~LineRenderer();
+
+		void drawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec3& color);
+
+	};
+
 }

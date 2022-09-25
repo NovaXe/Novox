@@ -85,8 +85,18 @@
     <None Include="shaders\LightSource.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\SpriteShader.vert" />
-    <None Include="shaders\SpriteShader.frag" />
+    <None Include="shaders\LineShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\LineShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\SpriteShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\SpriteShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\TextureAtlas.png">

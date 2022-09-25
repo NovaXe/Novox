@@ -246,4 +246,60 @@ namespace rendering {
 
 	}
 
+
+
+	LineRenderer::LineRenderer(Shader& shader) : shader(shader)
+	{
+		initRenderData();
+	}
+
+	LineRenderer::~LineRenderer()
+	{
+		glDeleteVertexArrays(1, &this->lineVAO);
+	}
+
+	void LineRenderer::initRenderData()
+	{
+		GLuint VBO;
+		GLfloat vertices[] = {
+			0.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 1.0f
+		};
+
+		glGenVertexArrays(1, &this->lineVAO);
+		glGenBuffers(1, &VBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindVertexArray(this->lineVAO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+	}
+
+	void LineRenderer::drawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec3& color)
+	{
+		this->shader.use();
+		glm::vec3 dif = end - start;
+
+		glm::mat4 model(1.0f);
+
+
+
+		model = glm::translate(model, start);
+		model = glm::scale(model, dif);
+		this->shader.setMat4("model", model);
+		this->shader.setVec3("color", color);
+
+		glBindVertexArray(this->lineVAO);
+		glLineWidth(10);
+		glDrawArrays(GL_LINES, 0, 2);
+		glBindVertexArray(0);
+
+	}
+
 }

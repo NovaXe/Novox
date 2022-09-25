@@ -167,6 +167,8 @@ xcopy /Y "$(ProjectDir)shaders" "$(OutDir)\shaders\"</Command>
     <ClInclude Include="novox\world.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\LineShader.frag" />
+    <None Include="shaders\LineShader.vert" />
     <None Include="shaders\SpriteShader.frag" />
     <None Include="shaders\SpriteShader.vert" />
     <None Include="shaders\LightingShader.frag" />

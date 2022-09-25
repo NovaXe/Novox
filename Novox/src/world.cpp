@@ -142,13 +142,13 @@ namespace novox::world {
 
 
 		
-		glm::ivec3 currentVoxel = {0,0,0};
+		glm::ivec3 currentVoxel(0);
 
 		//start = start + glm::vec3(0.5);
 		
-		//currentVoxel = glm::floor(start);
+		currentVoxel = glm::floor(start);
 
-		if (start.x >= 0) {
+		/*if (start.x >= 0) {
 			currentVoxel.x = glm::floor(start.x);
 		}
 		else {
@@ -165,7 +165,7 @@ namespace novox::world {
 		}
 		else {
 			currentVoxel.z = glm::ceil(start.z);
-		}
+		}*/
 
 		auto firstVoxel = currentVoxel;
 		auto lastVoxel = glm::ivec3(glm::floor(end));
@@ -176,9 +176,9 @@ namespace novox::world {
 		
 
 
-		int stepX = (rayDirection.x < 0) ? -1 : (rayDirection.x == 0) ? 0 : 1 * voxel_size;
-		int stepY = (rayDirection.y < 0) ? -1 : (rayDirection.y == 0) ? 0 : 1 * voxel_size;
-		int stepZ = (rayDirection.z < 0) ? -1 : (rayDirection.z == 0) ? 0 : 1 * voxel_size;
+		int stepX = (ray.x < 0) ? -1 : (ray.x == 0) ? 0 : 1 * voxel_size;
+		int stepY = (ray.y < 0) ? -1 : (ray.y == 0) ? 0 : 1 * voxel_size;
+		int stepZ = (ray.z < 0) ? -1 : (ray.z == 0) ? 0 : 1 * voxel_size;
 
 
 		//float tMaxX = (rayDirection.x != 0) ? (std::max(0.0f, glm::ceil(start.x)) - start.x) / rayDirection.x : FLT_MAX;
