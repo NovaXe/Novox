@@ -147,6 +147,7 @@ xcopy /Y "$(ProjectDir)shaders" "$(OutDir)\shaders\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\data.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\block.cpp" />
     <ClCompile Include="src\game.cpp" />
@@ -159,6 +160,7 @@ xcopy /Y "$(ProjectDir)shaders" "$(OutDir)\shaders\"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="novox\block.h" />
+    <ClInclude Include="novox\data.h" />
     <ClInclude Include="novox\game.h" />
     <ClInclude Include="novox\player.h" />
     <ClInclude Include="novox\mesh.h" />

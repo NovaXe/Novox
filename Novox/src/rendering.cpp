@@ -177,6 +177,14 @@ namespace rendering {
 		glBindTexture(GL_TEXTURE_2D, this->ID);
 	}
 
+	Renderer::Renderer(Shader& shader) : shader(shader) {}
+	Renderer::~Renderer() {
+		glDeleteVertexArrays(1, &this->VAO);
+	}
+
+
+
+
 	void SpriteRenderer::initRenderData()
 	{
 		GLuint VBO;
@@ -301,5 +309,8 @@ namespace rendering {
 		glBindVertexArray(0);
 
 	}
+
+
+
 
 }

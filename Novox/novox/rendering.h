@@ -9,7 +9,8 @@
 namespace rendering {
 	class Shader;
 	class Texture;
-	
+	class Renderer;
+
 
 
 
@@ -47,6 +48,9 @@ namespace rendering {
 		void bind();
 	};
 
+	
+
+
 	class SpriteRenderer {
 	private:
 		Shader& shader;
@@ -74,6 +78,18 @@ namespace rendering {
 
 		void drawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec3& color);
 
+	};
+
+	class Renderer {
+	private:
+		Shader& shader;
+		virtual void initRenderData() = 0;
+		GLuint VAO;
+	public:
+		Renderer(Shader& shader);
+		~Renderer();
+		virtual void renderToScreen() = 0;
+		
 	};
 
 }

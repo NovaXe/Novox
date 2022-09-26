@@ -52,6 +52,8 @@ namespace novox::util {
 
 	};
 
+	
+
 	template <typename Enumeration>
 	auto as_int(Enumeration const value)
 		-> typename std::underlying_type<Enumeration>::type
