@@ -10,6 +10,9 @@ namespace novox{
 	Player::Player() {
 		this->position = glm::vec3(0);
 		this->movement_speed = 2.5f;
+		this->blockSelected = false;
+		this->selectionPos = glm::ivec3(0);
+		this->placementLocation = glm::ivec3(0);
 
 		this->camera = new Camera(this->position, -90);
 

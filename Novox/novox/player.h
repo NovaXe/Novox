@@ -48,6 +48,7 @@ namespace novox {
 		Camera* getCamera();
 
 		glm::ivec3 selectionPos;
+		glm::ivec3 placementLocation;
 		bool blockSelected;
 
 		glm::ivec3 getSelectionPos();

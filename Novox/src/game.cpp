@@ -382,6 +382,8 @@ namespace novox {
 			rayIntersections.push_back(voxelPos);
 		}
 
+		
+		int count = 0;
 		for (const auto& [voxelPos, voxel] : playerSelectedVoxels) {
 			
 			//fmt::print("<{:02}, {:02}, {:02}>\t:\t[ {} ]\t[{:02}]\n", voxelPos.x, voxelPos.y, voxelPos.z, voxel.block->block_id, playerSelectedVoxels.size());
@@ -390,9 +392,18 @@ namespace novox {
 				blockSelected = true;
 				break;
 			}
+			else {
+				blockSelected = false;
+			}
+			count++;
 		}
+
 		this->player->blockSelected = blockSelected;
 
+		if (blockSelected && count > 1) {
+			auto secondToLastTraversed = playerSelectedVoxels.at(--count);
+			this->player->placementLocation = secondToLastTraversed.first;
+		}
 	}
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -477,13 +488,12 @@ namespace novox {
 
 	void Game::mouseClicked(int button, int action, int mods) {
 		glm::ivec3 selpos = this->player->selectionPos;
-		if (!this->world->checkBounds(selpos)){
-			return;
-		}
+		glm::ivec3 placepos = this->player->placementLocation;
 
 
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+			if (!this->player->blockSelected || !this->world->checkBounds(selpos)) return;
 			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::air)];
 
@@ -491,11 +501,12 @@ namespace novox {
 			this->world->updateChunkMesh(chunk, selpos);
 		}
 		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-			world::WorldVoxel& voxel = this->world->getVoxel(selpos);
+			if (!this->player->blockSelected || !this->world->checkBounds(placepos)) return;
+			world::WorldVoxel& voxel = this->world->getVoxel(placepos);
 			voxel.block = world::Block::defaultBlocks[util::as_int(world::BLOCK::stone)];
 
-			world::Chunk& chunk = this->world->getChunkAt(selpos.x, selpos.y, selpos.z);
-			this->world->updateChunkMesh(chunk, selpos);
+			world::Chunk& chunk = this->world->getChunkAt(placepos.x, placepos.y, placepos.z);
+			this->world->updateChunkMesh(chunk, placepos);
 		}
 	}
 

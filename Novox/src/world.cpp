@@ -25,6 +25,7 @@ namespace novox::world {
 					Chunk& chunk = this->chunks.at(x, y, z);
 					chunk.setLocation(glm::ivec3(x, y, z));
 					fmt::print("chunk loc {},{},{}\n", x, y, z);
+					chunk.populate();
 					//fmt::print("chunk location set: {},{},{}\t\t", x, y, z);
 					//auto newloc = chunk.getLocation();
 					//fmt::print("chunk new location: {},{},{}\n", newloc.x, newloc.y, newloc.z);
@@ -32,6 +33,7 @@ namespace novox::world {
 				}
 			}
 		}
+
 
 		fmt::print("Generated world of size {}x{}x{}\n", x_size, y_size, z_size);
 	}
@@ -253,8 +255,28 @@ namespace novox::world {
 
 	Chunk::Chunk() : blocks(16, 16, 16) {
 		//fmt::print("Generated chunk of size {}x{}x{}\n", 16, 16, 16);
+
 		this->mesh = new mesh::ChunkMesh();
 		this->location = glm::ivec3(0);
+	}
+	void Chunk::populate() {
+		for (int i = 0; i < 16; i++) {
+			for (int j = 0; j < 16; j++) {
+				for (int k = 0; k < 16; k++) {
+					auto& voxel = this->blocks.at(i, j, k);
+					auto blockPos = this->location * 16 + glm::ivec3(i, j, k);
+					if (blockPos.y < 16) {
+						voxel.block = Block::defaultBlocks.at(1);
+					}
+					else if (blockPos.y < 24) {
+						voxel.block = Block::defaultBlocks.at(2);
+					}
+					
+
+
+				}
+			}
+		}
 	}
 	
 	void Chunk::setLocation(const glm::ivec3& location)

@@ -50,6 +50,7 @@ namespace novox::world {
 
 	public:
 		Chunk();
+		void populate();
 		void draw(rendering::Shader& shader);
 		void tagForRegen();
 		void setLocation(const glm::ivec3& location);

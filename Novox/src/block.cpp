@@ -94,7 +94,7 @@ namespace novox::world{
 	WorldVoxel::WorldVoxel(const Block* block) : block(block) {
 		this->data = {};
 	}
-	WorldVoxel::WorldVoxel() : block(Block::defaultBlocks.at(rand() % 2)) {
+	WorldVoxel::WorldVoxel() : block(Block::defaultBlocks.at(0)) {
 		this->data = {};
 		std::string name = this->block->name;
 		//fmt::print("created worldvoxel {}\n", name);
