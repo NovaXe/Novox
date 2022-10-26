@@ -8,6 +8,7 @@
 #include "novox/rendering.h"
 #include "novox/util.h"
 #include <fmt/core.h>
+#include "novox/data.h"
 
 namespace novox::mesh {
 	ChunkMesh::ChunkMesh() {
@@ -56,14 +57,15 @@ namespace novox::mesh {
 		this->vertices.clear();
 	}
 
-	void ChunkMesh::draw(rendering::Shader& shader, const glm::vec3& loc)
+	void ChunkMesh::draw(std::shared_ptr<rendering::Shader> shader, const glm::vec3& loc)
 	{
-		static rendering::Texture textureAtlas("textures/TextureAtlas.png");
-		shader.use();
-		textureAtlas.bind();
+		
+		static std::shared_ptr<rendering::Texture> textureAtlas = data::loadTexture("textures/TextureAtlas.png", "atlas");
+		shader->use();
+		textureAtlas->bind();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, loc * 16.0f);
-		shader.setMat4("model", model);
+		shader->setMat4("model", model);
 
 		//fmt::print("chunk drawn at location: {},{},{}\n", loc.x, loc.y, loc.z);
 

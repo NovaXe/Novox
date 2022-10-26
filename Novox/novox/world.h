@@ -5,11 +5,13 @@
 #include <glm/glm.hpp>
 #include <windows.h>
 #include <fmt/core.h>
+#include <memory>
 
 #include "novox/util.h"
 #include "novox/block.h"
 #include "novox/mesh.h"
 #include "novox/rendering.h"
+
 
 namespace novox::world {
 	class World;
@@ -51,7 +53,7 @@ namespace novox::world {
 	public:
 		Chunk();
 		void populate();
-		void draw(rendering::Shader& shader);
+		void draw(std::shared_ptr<rendering::Shader> shader);
 		void tagForRegen();
 		void setLocation(const glm::ivec3& location);
 		const glm::ivec3& getLocation();

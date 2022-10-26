@@ -2,30 +2,33 @@
 
 #include <string>
 #include <map>
+#include <glm/glm.hpp>
 #include "rendering.h"
-
+#include "world.h"
 
 namespace novox::data {
 
 	typedef rendering::Shader Shader;
 	typedef rendering::Texture Texture;
 
-	class ResourceManager {
-	private:
+	
 
-		
+	
+	extern std::map<std::string, std::shared_ptr<Shader>> shaderMap;
+	extern std::map<std::string, std::shared_ptr<Texture>> textureMap;
 
-	public:
-		static std::map<std::string, rendering::Shader> shaderMap;
-		static std::map<std::string, rendering::Texture> textureMap;
+	std::shared_ptr<Shader> loadShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile, const std::string& name);
+	std::shared_ptr<Texture> loadTexture(const std::string& textureFile, const std::string& name);
 
-		static Shader getShader(const std::string& name);
+	std::shared_ptr<Shader> getShader(const std::string& name);
+	std::shared_ptr<Texture> getTexture(const std::string& name);
 
-		static Shader loadShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile, const std::string& name);
 
-		static Texture loadTexture(const std::string& textureFile, const std::string& name);
-	};
 
+
+
+	world::Chunk& loadChunk(world::World& world, const glm::ivec3& chunkPosition);
+	
 
 
 }

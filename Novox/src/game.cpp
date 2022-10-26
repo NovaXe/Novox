@@ -20,6 +20,7 @@
 #include "novox/world.h"
 #include "novox/mesh.h"
 #include "novox/util.h"
+#include "novox/data.h"
 
 #define WORLD_SIZE 2
 
@@ -118,15 +119,17 @@ namespace novox {
 
 
 	void Game::render() {
-		static Shader lightingShader("shaders/LightingShader.vert", "shaders/LightingShader.frag");
-		static Shader lightSourceShader("shaders/LightSource.vert", "shaders/LightSource.frag");
+		static std::shared_ptr<Shader> lightingShader = data::loadShader("shaders/LightingShader.vert", "shaders/LightingShader.frag", "lighting");
+		static std::shared_ptr<Shader> lightSourceShader = data::loadShader("shaders/LightSource.vert", "shaders/LightSource.frag", "lightSource");
+		
 		static Shader spriteShader("shaders/SpriteShader.vert", "shaders/SpriteShader.frag");
 		static Shader lineShader("shaders/LineShader.vert", "shaders/LineShader.frag");
 		
 		static LineRenderer lineRenderer(lineShader);
 		static SpriteRenderer spriteRenderer(spriteShader);
 		
-		static Texture crosshair("textures/Crosshair.png");
+		//static Texture crosshair("textures/Crosshair.png");
+		static std::shared_ptr<Texture> crosshair = data::loadTexture("textures/Crosshair.png", "crosshair");
 		
 
 
@@ -224,7 +227,7 @@ namespace novox {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		lightingShader.use();
+		lightingShader->use();
 
 		glm::mat4 view = this->player->getView();
 
@@ -238,12 +241,12 @@ namespace novox {
 
 		glm::mat4 projection = glm::perspective(glm::radians(80.0f), ((float)window_width / (float)window_height), 0.1f, 500.0f);
 
-		lightingShader.setMat4("view", view);
-		lightingShader.setMat4("projection", projection);
+		lightingShader->setMat4("view", view);
+		lightingShader->setMat4("projection", projection);
 
-		lightingShader.setVec3("lightColor", glm::vec3(1.0, 1.0, 1.0));
-		lightingShader.setVec3("lightPos", glm::vec3(WORLD_SIZE * 16, WORLD_SIZE * 16 + 8, WORLD_SIZE * 16));
-		lightingShader.setVec3("viewPos", this->player->getCamera()->position);
+		lightingShader->setVec3("lightColor", glm::vec3(1.0, 1.0, 1.0));
+		lightingShader->setVec3("lightPos", glm::vec3(WORLD_SIZE * 16, WORLD_SIZE * 16 + 8, WORLD_SIZE * 16));
+		lightingShader->setVec3("viewPos", this->player->getCamera()->position);
 
 		for (int x = 0; x < WORLD_SIZE; x++) {
 			for (int y = 0; y < WORLD_SIZE; y++) {
@@ -268,9 +271,9 @@ namespace novox {
 		auto sel = this->player->selectionPos;
 
 		model = glm::translate(model, glm::vec3(sel));
-		lightingShader.use();
-		lightingShader.setMat4("model", model);
-		lightingShader.setVec3("objectColor", glm::vec3(0.0));
+		lightingShader->use();
+		lightingShader->setMat4("model", model);
+		lightingShader->setVec3("objectColor", glm::vec3(0.0));
 
 		glDisable(GL_CULL_FACE);
 

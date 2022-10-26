@@ -14,6 +14,8 @@
 
 
 #include "novox/rendering.h"
+#include "novox/data.h"
+
 
 namespace rendering {
 
@@ -96,12 +98,13 @@ namespace rendering {
 		return programID;
 	}
 
-	Shader::Shader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath) {
-		this->ID = compile(vertexPath, fragmentPath);
-		shadermap[name] = this;
-	}
+	
 	Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 		this->ID = compile(vertexPath, fragmentPath);
+	}
+	Shader::Shader(GLuint ID) : ID(ID)
+	{
+
 	}
 
 	void Shader::use() {
@@ -131,44 +134,43 @@ namespace rendering {
 
 
 
-	GLuint Texture::load()
+	//GLuint Texture::load()
+	//{
+	//	//static bool run_once = []()->bool {stbi_set_flip_vertically_on_load(true); return true; }();
+
+	//	GLuint texid = 0;
+	//	glGenTextures(1, &texid);
+	//	glActiveTexture(GL_TEXTURE0);
+	//	glBindTexture(GL_TEXTURE_2D, texid);
+	//	
+
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	//	int width, height, nrChannels;
+
+	//	static unsigned char* imgData;
+	//	imgData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+
+	//	if (imgData != NULL) {
+	//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
+	//		glGenerateMipmap(GL_TEXTURE_2D);
+	//		fmt::print("Succesfully loaded Texture\n");
+	//	}
+	//	else {
+	//		fmt::print("Failed to load Texture\n");
+	//	}
+	//	stbi_image_free(imgData);
+	//	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//	return texid;
+	////}
+
+	Texture::Texture(GLuint ID) : ID(ID)
 	{
-		//static bool run_once = []()->bool {stbi_set_flip_vertically_on_load(true); return true; }();
 
-		GLuint texid = 0;
-		glGenTextures(1, &texid);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texid);
-		
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		int width, height, nrChannels;
-
-		static unsigned char* imgData;
-		imgData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-
-		if (imgData != NULL) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
-			glGenerateMipmap(GL_TEXTURE_2D);
-			fmt::print("Succesfully loaded Texture\n");
-		}
-		else {
-			fmt::print("Failed to load Texture\n");
-		}
-		stbi_image_free(imgData);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		return texid;
-	}
-
-	Texture::Texture(const std::string& texturePath)
-	{
-		this->path = texturePath;
-		this->ID = load();
 	}
 
 	void Texture::bind()
@@ -226,7 +228,7 @@ namespace rendering {
 		glDeleteVertexArrays(1, &this->quadVAO);
 	}
 
-	void SpriteRenderer::drawSprite(Texture& texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color) 
+	void SpriteRenderer::drawSprite(std::shared_ptr<Texture> texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color) 
 	{
 		this->shader.use();
 		glm::mat4 model(1.0f);
@@ -242,7 +244,7 @@ namespace rendering {
 		this->shader.setVec3("spriteColor", color);
 
 		glActiveTexture(GL_TEXTURE0);
-		texture.bind();
+		texture->bind();
 
 
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

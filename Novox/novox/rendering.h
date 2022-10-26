@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <unordered_map>
+#include <memory>
 
 #define TEXTURE_ATLAS_WIDTH 16
 #define TEXTURE_WIDTH 16
@@ -19,8 +20,8 @@ namespace rendering {
 		GLuint compile(const std::string& vertexPath, const std::string& fragmentPath);
 		GLuint ID;
 	public:
-		Shader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
 		Shader(const std::string& vertexPath, const std::string& fragmentPath);
+		Shader(GLuint ID);
 		Shader() = default;
 
 		static std::unordered_map<std::string, Shader*> shadermap;
@@ -41,10 +42,9 @@ namespace rendering {
 	class Texture {
 	private:
 		GLuint ID;
-		std::string path;
 		GLuint load();
 	public:
-		Texture(const std::string& texturePath);
+		Texture(GLuint ID);
 		void bind();
 	};
 
@@ -62,7 +62,7 @@ namespace rendering {
 		SpriteRenderer(Shader& shader);
 		~SpriteRenderer();
 
-		void drawSprite(Texture& texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color);
+		void drawSprite(std::shared_ptr<Texture> texture, const glm::vec2& pos, const glm::vec2& size, float rotation, const glm::vec3& color);
 
 	};
 

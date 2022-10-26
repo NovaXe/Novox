@@ -295,7 +295,7 @@ namespace novox::world {
 	
 
 
-	void Chunk::draw(rendering::Shader& shader)
+	void Chunk::draw(std::shared_ptr<rendering::Shader> shader)
 	{
 		this->mesh->draw(shader, this->location);
 	}
